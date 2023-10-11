@@ -57,13 +57,6 @@ let app = (function (api){
         });
     }
 
-    let _convBpToObj = (data) => {
-        return data.map((elem) => ({
-            bpName: elem.name,
-            points: elem.points
-        }));
-    }
-
     let _drawBluePrint = (bp) => {
         _showInfoBP(bp);
         let points = bp.points;
@@ -82,28 +75,36 @@ let app = (function (api){
         $("#bp-name").text("Current Blue Print: " + bp.name);
         $("#bp-frame").removeClass("hide");
     }
+    let _draw = function (event){
+        let canvas = $("#canvas-bp")[0];
+        ctx = canvas.getContext("2d");
+        let offset  = _getOffset(canvas);
+        let pointX = event.pageX - offset.left;
+        let pointY = event.pageY - offset.top;
+        _currenBP.points.push({x: pointX,y:pointY});
+        _drawBluePrint(_currenBP);
+    }
+    let _getOffset = function (obj) {
+        var offsetLeft = 0;
+        var offsetTop = 0;
+        do {
+            if (!isNaN(obj.offsetLeft)) {
+                offsetLeft += obj.offsetLeft;
+            }
+            if (!isNaN(obj.offsetTop)) {
+                offsetTop += obj.offsetTop;
+            }
+        } while(obj = obj.offsetParent );
+        return {left: offsetLeft, top: offsetTop};
+    }
     publicFunctions.canvaslistenerInit = function (){
         let canvas = $("#canvas-bp")[0];
+        ctx = canvas.getContext("2d");
         if(window.PointerEvent) {
-            canvas.addEventListener("pointerdown", function(event){
-                let pointX = event.pageX - 600;
-                let pointY = event.pageY - 180;
-                _currenBP.points.push({"x": pointX,"y":pointY});
-                //api.getBlueprintsByNameAndAuthor(_author, _currenBPName, _updateCanvas);
-                //console.log(_author +' pointerdown at '+(event.pageX - 600)+','+(event.pageY - 180) +
-                //   " "+ _currenBP.points[_currenBP.points.length-1].x +
-                //    " "+ _currenBP.points[_currenBP.points.length-1].y +
-                //    " " + _currenBP.points);
-                _drawBluePrint(_currenBP);
-
-            });
+            canvas.addEventListener("pointerdown", _draw, false);
         }
         else {
-            canvas.addEventListener("mousedown", function(event){
-                    console.log('mousedown at '+(event.pageX - 600)+','+(event.pageY - 180));
-
-                }
-            );
+                canvas.addEventListener("mousedown", _draw, false);
         }
     }
     publicFunctions.setName = function (newName) {
