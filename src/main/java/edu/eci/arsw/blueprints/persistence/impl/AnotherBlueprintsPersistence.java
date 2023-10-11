@@ -35,4 +35,8 @@ public class AnotherBlueprintsPersistence implements BlueprintsPersistence {
 
     @Override
     public void updateBluePrint(Blueprint bluePrint, String author, String name) throws BlueprintNotFoundException {}
+
+    @Override
+    public void deleteBlueprint(String author, String name) throws BlueprintNotFoundException {}
+
 }
